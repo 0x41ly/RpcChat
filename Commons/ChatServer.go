@@ -1,6 +1,7 @@
 package commons
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -17,6 +18,17 @@ type ChatServer struct {
 // Register registers a client username with the chat server.
 // It sends a message to all Users notifying a user has joined
 func (c *ChatServer) Register(username string, reply *string) error {
+
+	username = CheckUserName(username)
+	var exist bool
+	err := c.DoesUserExsist(&username, &exist)
+	if err != nil {
+		return errors.New("unable to register you")
+	}
+	if exist {
+		return errors.New("username is already found :)")
+	}
+
 	*reply = "Welcome to GoChat v1.0!\n"
 	*reply += "List of Users online:\n"
 
@@ -57,7 +69,7 @@ func (c *ChatServer) List(none Nothing, reply *[]string) error {
 func (c *ChatServer) DoesUserExsist(user *string, exist *bool) error {
 	*exist = false
 	for i := range c.Users {
-		if c.Users[i] == *user {
+		if c.Users[i] == CheckUserName(*user) {
 			*exist = true
 			break
 		}
@@ -67,7 +79,7 @@ func (c *ChatServer) DoesUserExsist(user *string, exist *bool) error {
 func (c *ChatServer) Tell(msg Message, reply *Nothing) error {
 
 	if queue, ok := c.MessageQueue[msg.Target]; ok {
-		m := msg.User + " tells you " + msg.Msg
+		m := msg.MsgDate.Format("2006/01/02 15:04:05") + ": " + msg.User + " tells you " + msg.Msg
 		c.MessageQueue[msg.Target] = append(queue, m)
 	} else {
 		m := msg.Target + " does not exist"
