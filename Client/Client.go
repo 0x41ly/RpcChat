@@ -63,11 +63,11 @@ func mainLoop(c *commons.ChatClient) {
 		line = strings.TrimSpace(line)
 		params := strings.Fields(line)
 
-		if strings.HasPrefix(line, "list") {
+		if strings.HasPrefix(line, "/!list") {
 			c.List()
-		} else if strings.HasPrefix(line, "tell") {
+		} else if strings.HasPrefix(line, "/!tell ") {
 			c.Tell(params)
-		} else if strings.HasPrefix(line, "logout") {
+		} else if strings.HasPrefix(line, "/!logout") {
 			c.Logout()
 			break
 		} else {
